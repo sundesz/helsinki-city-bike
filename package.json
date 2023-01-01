@@ -1,0 +1,33 @@
+{
+  "name": "helsinki-city-bike",
+  "version": "1.0.0",
+  "description": "Helsinki city bike app (Dev Academy pre-assignment)",
+  "main": "index.js",
+  "scripts": {
+    "tsc": "tsc",
+    "dev": "ts-node-dev src/index.ts",
+    "lint": "eslint --ext .ts .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sundesz/helsinki-city-bike.git"
+  },
+  "author": "Sandesh Hyoju",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sundesz/helsinki-city-bike/issues"
+  },
+  "homepage": "https://github.com/sundesz/helsinki-city-bike#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.15",
+    "@typescript-eslint/eslint-plugin": "^5.47.1",
+    "@typescript-eslint/parser": "^5.47.1",
+    "eslint": "^8.31.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
