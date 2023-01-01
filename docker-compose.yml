@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgresdb:
+    image: postgres
+    ports:
+      - 5432:5432
+    restart: always
+    container_name: hsl_postgresdb
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: hsl-bike-app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
