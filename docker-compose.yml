@@ -10,7 +10,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: hsl-bike-app
+      POSTGRES_DB: hslbikeapp
     volumes:
       - pgdata:/var/lib/postgresql/data
 
