@@ -17,40 +17,33 @@ export const up: Migration = async ({ context: queryInterface }) => {
       },
       name_fi: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       name_se: {
         type: DataTypes.STRING,
       },
       address_fi: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       address_se: {
         type: DataTypes.STRING,
       },
       city_fi: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       city_se: {
         type: DataTypes.STRING,
       },
       operator: {
         type: DataTypes.STRING,
-        allowNull: false,
       },
       capacity: {
         type: DataTypes.SMALLINT,
-        allowNull: false,
       },
       pos_x: {
         type: DataTypes.DECIMAL,
-        allowNull: false,
       },
       pos_y: {
         type: DataTypes.DECIMAL,
-        allowNull: false,
       },
       created_at: {
         type: DataTypes.DATE,

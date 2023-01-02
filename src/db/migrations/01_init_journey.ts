@@ -6,34 +6,41 @@ export const up: Migration = async ({ context: queryInterface }) => {
     await queryInterface.createTable('journey_list', {
       journey_id: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        defaultValue: Sequelize.literal('gen_random_uuid()'),
         primaryKey: true,
+      },
+      departure: {
+        type: DataTypes.DATE,
+        allowNull: false,
       },
       departure_station_id: {
         type: DataTypes.SMALLINT,
         allowNull: false,
-        references: { model: 'station_list', key: 'station_id' },
+        // references: { model: 'station_list', key: 'station_id' },
       },
-      departure_timestamp: {
+      departure_station_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      return: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       return_station_id: {
         type: DataTypes.SMALLINT,
         allowNull: false,
-        references: { model: 'station_list', key: 'station_id' },
+        // references: { model: 'station_list', key: 'station_id' },
       },
-      return_timestamp: {
-        type: DataTypes.DATE,
+      return_station_name: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
       distance_covered: {
-        type: DataTypes.SMALLINT,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       duration: {
-        type: DataTypes.SMALLINT,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
     });

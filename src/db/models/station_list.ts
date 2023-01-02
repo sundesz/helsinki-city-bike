@@ -21,7 +21,7 @@ export interface IStationAttribute {
 
 export type IStationInput = Omit<IStationAttribute, 'stationId'>;
 
-class StationList
+class Station
   extends Model<IStationAttribute, IStationInput>
   implements IStationAttribute
 {
@@ -43,7 +43,7 @@ class StationList
   public readonly updatedAt!: string;
 }
 
-StationList.init(
+Station.init(
   {
     stationId: {
       type: DataTypes.SMALLINT,
@@ -58,40 +58,33 @@ StationList.init(
     },
     nameFi: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     nameSe: {
       type: DataTypes.STRING,
     },
     addressFi: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     addressSe: {
       type: DataTypes.STRING,
     },
     cityFi: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     citySe: {
       type: DataTypes.STRING,
     },
     operator: {
       type: DataTypes.STRING,
-      allowNull: false,
     },
     capacity: {
       type: DataTypes.SMALLINT,
-      allowNull: false,
     },
     posX: {
       type: DataTypes.DECIMAL,
-      allowNull: false,
     },
     posY: {
       type: DataTypes.DECIMAL,
-      allowNull: false,
     },
   },
   {
@@ -103,4 +96,4 @@ StationList.init(
   }
 );
 
-export default StationList;
+export default Station;

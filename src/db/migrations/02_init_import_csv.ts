@@ -2,7 +2,7 @@ import { DataTypes, Sequelize } from 'sequelize';
 import { Migration } from '..';
 
 export const up: Migration = async ({ context: queryInterface }) => {
-  await queryInterface.createTable('import_csv', {
+  await queryInterface.createTable('import_csv_list', {
     import_csv_id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
