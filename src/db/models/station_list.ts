@@ -1,28 +1,9 @@
 import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '..';
-
-export interface IStationAttribute {
-  stationId: number;
-  fid: number;
-  nameEn: string;
-  nameFi: string;
-  nameSe: string;
-  addressFi: string;
-  addressSe: string;
-  cityFi: string;
-  citySe: string;
-  operator: string;
-  capacity: number;
-  posX: number;
-  posY: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export type IStationInput = Omit<IStationAttribute, 'stationId'>;
+import { IStationAttribute, StationInputType } from '../../types/station';
 
 class Station
-  extends Model<IStationAttribute, IStationInput>
+  extends Model<IStationAttribute, StationInputType>
   implements IStationAttribute
 {
   public stationId!: number;

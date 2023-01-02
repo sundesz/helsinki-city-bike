@@ -1,33 +1,19 @@
 import { Model, DataTypes } from 'sequelize';
 import { sequelize } from '..';
-
-export interface IJourneyAttribute {
-  journeyId: string;
-  departure: string;
-  departureStationId: string;
-  departureStationName: string;
-  return: string;
-  returnStationId: string;
-  returnStationName: string;
-  distanceCovered: number;
-  duration: number;
-}
-
-// defines the type of the object passed to Sequelize’s model.create
-export type IJourneyInput = Omit<IJourneyAttribute, 'journeyId'>;
+import { IJourneyAttribute, JourneyInputType } from '../../types/journey';
 
 class Journey
-  extends Model<IJourneyAttribute, IJourneyInput>
+  extends Model<IJourneyAttribute, JourneyInputType>
   implements IJourneyAttribute
 {
   public journeyId!: string;
 
   public departure!: string;
-  public departureStationId!: string;
+  public departureStationId!: number;
   public departureStationName!: string;
 
   public return!: string;
-  public returnStationId!: string;
+  public returnStationId!: number;
   public returnStationName!: string;
 
   public distanceCovered!: number;
