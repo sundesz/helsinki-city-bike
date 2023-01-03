@@ -10,7 +10,7 @@ app.get('/ping', (_req: Request, res: Response) => {
   res.send('pong');
 });
 
-app.use(journeyRoutes);
-app.use(stationRoutes);
+app.use('/journey', journeyRoutes);
+app.use('/station', stationRoutes);
 
 export default app;

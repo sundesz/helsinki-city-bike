@@ -64,6 +64,7 @@ Journey.init(
   },
   {
     sequelize,
+    timestamps: false,
     underscored: true,
     freezeTableName: true,
     tableName: 'journey_list',
