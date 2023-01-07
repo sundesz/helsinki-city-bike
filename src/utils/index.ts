@@ -1,21 +1,52 @@
 import fs, { opendirSync } from 'fs';
-import readline from 'readline';
+import { parse, ParserHeaderArray } from 'fast-csv';
 import { SRC_DIR } from '..';
 import { sequelize } from '../db';
 import ImportCsv from '../db/models/import_csv';
 import { logEvents } from '../middleware/logger';
 import { FileTypes } from '../types';
-import { JourneyInputType, JOURNEY_FIELDS } from '../types/journey';
-import { StationInputType, STATION_FIELDS } from '../types/station';
+import {
+  IJourneyCSVRow,
+  JourneyInputType,
+  JOURNEY_FIELDS,
+  JOURNEY_TABLE_FIELDS,
+} from '../types/journey';
+import {
+  IStationCSVRow,
+  StationInputType,
+  STATION_FIELDS,
+  STATION_TABLE_FIELDS,
+} from '../types/station';
 
+// Set the batch size
+const batchSize = 100;
+
+// Set the counter to 0
+let i = 0;
+
+/**
+ * Check if text is string
+ * @param text
+ * @returns
+ */
 const isString = (text: unknown): text is string => {
   return typeof text === 'string' || text instanceof String;
 };
 
+/**
+ * Check if text is date
+ * @param date
+ * @returns
+ */
 const isDate = (date: string): boolean => {
   return Boolean(Date.parse(date));
 };
 
+/**
+ * Parse Date
+ * @param date
+ * @returns
+ */
 const parseDate = (date: unknown): string => {
   if (!date || !isString(date) || !isDate(date)) {
     throw new Error(`Invalid or missing date: ${date}`);
@@ -24,6 +55,11 @@ const parseDate = (date: unknown): string => {
   return date;
 };
 
+/**
+ * Parse number
+ * @param text
+ * @returns
+ */
 export const parseNumber = (text: unknown): number => {
   const num = Number(text);
   if (!text || Number.isNaN(num)) {
@@ -33,6 +69,11 @@ export const parseNumber = (text: unknown): number => {
   return num;
 };
 
+/**
+ * Parse string
+ * @param text
+ * @returns
+ */
 export const parseString = (text: unknown): string => {
   if (!text || !isString(text)) {
     throw new Error('not a string');
@@ -43,15 +84,18 @@ export const parseString = (text: unknown): string => {
 
 /**
  * Get CSV file type. Is it Journey file or Station File?
- * @param line
+ * @param header
  * @returns
  */
-export const getFileType = (line: string): FileTypes | undefined => {
-  const fields = line.toLowerCase().trim();
+export const getFileType = (
+  header: ParserHeaderArray
+): FileTypes | undefined => {
+  const headerString = header.toString();
+
   switch (true) {
-    case fields === JOURNEY_FIELDS.join(','):
+    case headerString === JOURNEY_FIELDS.toString():
       return 'journey';
-    case fields === STATION_FIELDS.join(','):
+    case headerString === STATION_FIELDS.toString():
       return 'station';
     default:
       return undefined;
@@ -66,18 +110,15 @@ export const getFileType = (line: string): FileTypes | undefined => {
  */
 export const parseRow = (
   fileType: FileTypes,
-  row: string
+  row: IJourneyCSVRow | IStationCSVRow
 ): StationInputType | JourneyInputType | null => {
   try {
-    // https://stackoverflow.com/questions/23582276/split-string-by-comma-but-ignore-commas-inside-quotes
-    const record = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-
     if (fileType === 'journey') {
-      return parseJourneyFile(record);
+      return parseJourneyFile(row as IJourneyCSVRow);
     }
 
     if (fileType === 'station') {
-      return parseStationFile(record);
+      return parseStationFile(row as IStationCSVRow);
     }
 
     return null;
@@ -92,26 +133,24 @@ export const parseRow = (
  * @param record
  * @returns
  */
-const parseStationFile = (record: string[]): StationInputType | null => {
-  if (record.length !== STATION_FIELDS.length) {
-    return null;
-  }
-
+export const parseStationFile = (
+  record: IStationCSVRow
+): StationInputType | null => {
   try {
     const stationRecord = {
-      stationId: parseNumber(record[1]),
-      fid: parseNumber(record[0]),
-      nameEn: parseString(record[2]),
-      nameFi: parseString(record[3]),
-      nameSe: parseString(record[4]),
-      addressFi: parseString(record[5]),
-      addressSe: parseString(record[6]),
-      cityFi: parseString(record[7]),
-      citySe: parseString(record[8]),
-      operator: parseString(record[9]),
-      capacity: parseNumber(record[10]),
-      posX: parseNumber(record[11]),
-      posY: parseNumber(record[12]),
+      stationId: parseNumber(record.id),
+      fid: parseNumber(record.fid),
+      nameEn: parseString(record.name),
+      nameFi: parseString(record.nimi),
+      nameSe: parseString(record.namn),
+      addressFi: parseString(record.osoite),
+      addressSe: parseString(record.adress),
+      cityFi: parseString(record.kaupunki),
+      citySe: parseString(record.stad),
+      operator: parseString(record.operaattor),
+      capacity: parseNumber(record.kapasiteet),
+      posX: parseNumber(record.x),
+      posY: parseNumber(record.y),
     };
 
     return stationRecord;
@@ -126,14 +165,10 @@ const parseStationFile = (record: string[]): StationInputType | null => {
  * @param record
  * @returns
  */
-const parseJourneyFile = (record: string[]): JourneyInputType | null => {
+const parseJourneyFile = (record: IJourneyCSVRow): JourneyInputType | null => {
   try {
-    if (record.length !== JOURNEY_FIELDS.length) {
-      return null;
-    }
-
-    const distanceCovered = Number(record[6]);
-    const duration = Number(record[7]);
+    const distanceCovered = Number(record['covered distance (m)']);
+    const duration = Number(record['duration (sec.)']);
 
     // Don't import journeys that covered distances shorter than 10 meters
     if (distanceCovered < 10) {
@@ -145,12 +180,12 @@ const parseJourneyFile = (record: string[]): JourneyInputType | null => {
     }
 
     const journeyRecord = {
-      departure: parseDate(record[0]),
-      departureStationId: parseNumber(record[2]),
-      departureStationName: parseString(record[3]),
-      return: parseDate(record[1]),
-      returnStationId: parseNumber(record[4]),
-      returnStationName: parseString(record[5]),
+      departureDateTime: parseDate(record.departure),
+      departureStationId: parseNumber(record['departure station id']),
+      departureStationName: parseString(record['departure station name']),
+      returnDateTime: parseDate(record.return),
+      returnStationId: parseNumber(record['return station id']),
+      returnStationName: parseString(record['return station name']),
       distanceCovered,
       duration,
     };
@@ -174,38 +209,39 @@ const deleteFile = (fileName: string): void => {
   });
 };
 
-// Set the batch size
-const batchSize = 100;
+/**
+ * Get table name, table fields and column template to insert row in database
+ * @param fileType
+ * @returns
+ */
+const getTableNameAndField = (fileType: FileTypes) => {
+  let tableName: string;
+  let tableFields: string;
+  let insertTemplate: string;
 
-// Set the counter to 0
-let i = 0;
+  if (fileType === 'journey') {
+    tableName = 'journey_list';
+    tableFields = `"${JOURNEY_TABLE_FIELDS.join('","')}"`;
+    insertTemplate = JOURNEY_TABLE_FIELDS.map(() => '?').toString();
+  } else {
+    tableName = 'station_list';
+    tableFields = `"${STATION_TABLE_FIELDS.join('","')}"`;
+    insertTemplate = STATION_TABLE_FIELDS.map(() => '?').toString();
+  }
 
-// Create a function to insert the next batch of rows
-export const insertBatchJourney = (data) => {
-  // Create a new array with the next batch of rows
-  const batch: JourneyInputType[] = data.slice(i, i + batchSize);
-  // Increment the counter by the batch size
-  i += batchSize;
-
-  // Insert the rows
-  return sequelize
-    .query(
-      `INSERT INTO "journey_list" ("departure","departure_station_id","departure_station_name","return","return_station_id","return_station_name","distance_covered","duration") VALUES ${batch
-        .map(() => '(?, ?, ?, ?, ?, ?, ?, ?)')
-        .join(',')}`,
-      { replacements: batch.flatMap((row) => Object.values(row)) }
-    )
-    .then(() => {
-      // Check if there are more rows to insert
-      if (i < data.length) {
-        // Insert the next batch
-        return insertBatchJourney(data);
-      }
-    });
+  return { tableName, tableFields, insertTemplate };
 };
 
-// Create a function to insert the next batch of rows
-export const insertBatchStation = (data) => {
+/**
+ * A function to insert the next batch of rows
+ * @param fileType
+ * @param data
+ * @returns
+ */
+export const insertBatch = (fileType: FileTypes, data) => {
+  const { tableName, tableFields, insertTemplate } =
+    getTableNameAndField(fileType);
+
   // Create a new array with the next batch of rows
   const batch: StationInputType[] = data.slice(i, i + batchSize);
   // Increment the counter by the batch size
@@ -214,8 +250,8 @@ export const insertBatchStation = (data) => {
   // Insert the rows
   return sequelize
     .query(
-      `INSERT INTO "station_list" ("station_id", "fid", "name_en","name_fi","name_se","address_fi","address_se","city_fi","city_se","operator","capacity","pos_x","pos_y") VALUES ${batch
-        .map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      `INSERT INTO "${tableName}" (${tableFields}) VALUES ${batch
+        .map(() => `(${insertTemplate})`)
         .join(',')}`,
       { replacements: batch.flatMap((row) => Object.values(row)) }
     )
@@ -223,11 +259,17 @@ export const insertBatchStation = (data) => {
       // Check if there are more rows to insert
       if (i < data.length) {
         // Insert the next batch
-        return insertBatchStation(data);
+        return insertBatch(fileType, data);
       }
     });
 };
 
+/**
+ * Check i file is already import or not
+ * @param fileName
+ * @param fileType
+ * @returns
+ */
 export const isFileAlreadyImport = async (
   fileName: string,
   fileType: FileTypes
@@ -239,67 +281,49 @@ export const isFileAlreadyImport = async (
   return alreadyImported;
 };
 
-// fileName with path
-const readFile = (fileName: string) => {
-  const stream = fs.createReadStream(fileName);
-  const rl = readline.createInterface({ input: stream });
-
+/**
+ * Parse csv file and insert the row to database
+ * @param fileName
+ */
+export const readFile = (fileName: string) => {
   const data: (StationInputType | JourneyInputType)[] = [];
-
-  let firstLine = true;
   let fileType: FileTypes | undefined = undefined;
-  // let isError = false;
-  // let fileAlreadyImported = false;
 
-  rl.on('line', (row) => {
-    if (firstLine) {
-      fileType = getFileType(row);
+  fs.createReadStream(fileName)
+    .pipe(
+      parse({
+        headers: (headers) => {
+          headers = headers.map((h) => h?.toLowerCase());
+          fileType = getFileType(headers);
+          return headers;
+        },
+      })
+    )
+    .on('error', (error) => console.log(error))
+    .on('data', (row) => {
+      if (fileType === undefined) {
+        return;
+      }
+      const parsedRow = parseRow(fileType, row);
 
-      // if (fileType) {
-      //   fileAlreadyImported = Boolean(
-      //     await isFileAlreadyImport(fileName, fileType)
-      //   );
-      // }
-      firstLine = false;
-      return;
-    }
+      if (parsedRow) {
+        data.push(parsedRow);
+      }
+    })
 
-    if (fileType === undefined) {
-      return;
-    }
+    .on('end', () => {
+      if (fileType === undefined) return;
 
-    const parsedRow = parseRow(fileType, row);
-
-    if (parsedRow) {
-      data.push(parsedRow);
-    }
-  });
-
-  rl.on('close', () => {
-    firstLine = true;
-    if (fileType) {
       void (async () => {
         try {
           // Start the insertion
-          if (fileType === 'journey') {
-            insertBatchJourney(data)
-              .then(() => {
-                // console.log('Rows inserted successfully');
-              })
-              .catch((error: unknown) => {
-                logErrorMessage(error);
-              });
-          }
-
-          if (fileType === 'station') {
-            insertBatchStation(data)
-              .then(() => {
-                // console.log('Rows inserted successfully');
-              })
-              .catch((error: unknown) => {
-                logErrorMessage(error);
-              });
-          }
+          insertBatch(fileType, data)
+            .then(() => {
+              // console.log('Rows inserted successfully');
+            })
+            .catch((error: unknown) => {
+              logErrorMessage(error);
+            });
 
           await ImportCsv.create({
             fileName,
@@ -312,25 +336,31 @@ const readFile = (fileName: string) => {
           logErrorMessage(error);
         }
       })();
-    }
-  });
+    });
 };
 
+/**
+ * List all csv file from the "src/data" directory to parse
+ */
 export const listAllCSVFiles = async () => {
   const PATH_FOR_DATA = `${SRC_DIR}/data`;
   const dir = opendirSync(PATH_FOR_DATA);
 
   for await (const entry of dir) {
     if (entry.isFile() && entry.name.endsWith('.csv')) {
-      // console.log('Found File: ', entry.name);
       readFile(`${PATH_FOR_DATA}/${entry.name}`);
     }
   }
 };
 
+/**
+ * Log error message to file
+ * @param err
+ */
 const logErrorMessage = (err: unknown) => {
   if (err instanceof Error) {
     void (async () => {
+      console.log(err.message);
       await logEvents(err.message);
     })();
   }
