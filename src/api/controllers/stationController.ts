@@ -52,7 +52,7 @@ const get: RequestHandler = async (req, res, next: NextFunction) => {
         'departureStationName',
         stationData.dataValues.nameFi
       );
-      console.log(returnStationTop5);
+
       res.json({
         data: {
           stationId: stationData.dataValues.stationId,
