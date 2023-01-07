@@ -19,9 +19,6 @@ const get: RequestHandler = async (req, res, next: NextFunction) => {
         'nameFi',
         'addressFi',
         'cityFi',
-        // ['name_fi', 'name'],
-        // ['address_fi', 'address'],
-        // ['city_fi', 'city'],
         'posX',
         'posY',
       ],
@@ -55,14 +52,19 @@ const get: RequestHandler = async (req, res, next: NextFunction) => {
         'departureStationName',
         stationData.dataValues.nameFi
       );
-
+      console.log(returnStationTop5);
       res.json({
         data: {
-          ...stationData.dataValues,
+          stationId: stationData.dataValues.stationId,
+          name: stationData.dataValues.nameFi,
+          address: stationData.dataValues.addressFi,
+          city: stationData.dataValues.cityFi,
+          posX: stationData.dataValues.posX,
+          posY: stationData.dataValues.posY,
           departureStation: departureStationData[0],
           returnStation: returnStationData[0],
-          departureTop5: departureStationTop5,
-          returnTop5: returnStationTop5,
+          top5Departure: departureStationTop5,
+          top5Return: returnStationTop5,
         },
       });
     } else {
@@ -143,16 +145,19 @@ export const getTopFiveStation = async (
   whereColumn: string,
   whereValue: string
 ) => {
+  const columnId = columnName.replace('Name', 'Id');
+
   return await Journey.findAll({
     attributes: [
+      `${columnId}`,
       `${columnName}`,
-      [sequelize.fn('COUNT', sequelize.col('journey_id')), 'test'],
+      [sequelize.fn('COUNT', sequelize.col('journey_id')), 'totalJourney'],
     ],
     where: {
       [whereColumn]: whereValue,
     },
-    group: [columnName],
-    order: [['test', 'desc']],
+    group: [columnName, columnId],
+    order: [['totalJourney', 'desc']],
     limit: 5,
   });
 };
