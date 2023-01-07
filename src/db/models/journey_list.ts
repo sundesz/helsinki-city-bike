@@ -8,11 +8,11 @@ class Journey
 {
   public journeyId!: string;
 
-  public departure!: string;
+  public departureDateTime!: string;
   public departureStationId!: number;
   public departureStationName!: string;
 
-  public return!: string;
+  public returnDateTime!: string;
   public returnStationId!: number;
   public returnStationName!: string;
 
@@ -27,7 +27,7 @@ Journey.init(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    departure: {
+    departureDateTime: {
       type: DataTypes.DATE,
       allowNull: false,
     },
@@ -40,7 +40,7 @@ Journey.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    return: {
+    returnDateTime: {
       type: DataTypes.DATE,
       allowNull: false,
     },

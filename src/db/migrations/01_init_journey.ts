@@ -9,7 +9,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
         defaultValue: Sequelize.literal('gen_random_uuid()'),
         primaryKey: true,
       },
-      departure: {
+      departure_date_time: {
         type: DataTypes.DATE,
         allowNull: false,
       },
@@ -22,7 +22,7 @@ export const up: Migration = async ({ context: queryInterface }) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      return: {
+      return_date_time: {
         type: DataTypes.DATE,
         allowNull: false,
       },
