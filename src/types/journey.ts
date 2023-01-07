@@ -9,12 +9,23 @@ export const JOURNEY_FIELDS = [
   'duration (sec.)',
 ];
 
+export const JOURNEY_TABLE_FIELDS = [
+  'departure_date_time',
+  'departure_station_id',
+  'departure_station_name',
+  'return_date_time',
+  'return_station_id',
+  'return_station_name',
+  'distance_covered',
+  'duration',
+];
+
 export interface IJourneyAttribute {
   journeyId: string;
-  departure: string;
+  departureDateTime: string;
   departureStationId: number;
   departureStationName: string;
-  return: string;
+  returnDateTime: string;
   returnStationId: number;
   returnStationName: string;
   distanceCovered: number;
@@ -24,13 +35,13 @@ export interface IJourneyAttribute {
 // defines the type of the object passed to Sequelize’s model.create
 export type JourneyInputType = Omit<IJourneyAttribute, 'journeyId'>;
 
-// export interface IJourney {
-//   departure: unknown;
-//   return: unknown;
-//   departure_station_id: unknown;
-//   departure_station_name: unknown;
-//   return_station_id: unknown;
-//   return_station_name: unknown;
-//   covered_distance: unknown;
-//   duration: unknown;
-// }
+export interface IJourneyCSVRow {
+  departure: unknown;
+  return: unknown;
+  'departure station id': unknown;
+  'departure station name': unknown;
+  'return station id': unknown;
+  'return station name': unknown;
+  'covered distance (m)': unknown;
+  'duration (sec.)': unknown;
+}

@@ -14,21 +14,37 @@ export const STATION_FIELDS = [
   'y',
 ];
 
-// export interface IStation {
-//   fid: unknown;
-//   id: unknown;
-//   nimi: unknown;
-//   namn: unknown;
-//   name: unknown;
-//   osoite: unknown;
-//   adress: unknown;
-//   kaupunki: unknown;
-//   stad: unknown;
-//   operaattor: unknown;
-//   kapasiteet: unknown;
-//   x: unknown;
-//   y: unknown;
-// }
+export const STATION_TABLE_FIELDS = [
+  'station_id',
+  'fid',
+  'name_en',
+  'name_fi',
+  'name_se',
+  'address_fi',
+  'address_se',
+  'city_fi',
+  'city_se',
+  'operator',
+  'capacity',
+  'pos_x',
+  'pos_y',
+];
+
+export interface IStationCSVRow {
+  fid: unknown;
+  id: unknown;
+  nimi: unknown;
+  namn: unknown;
+  name: unknown;
+  osoite: unknown;
+  adress: unknown;
+  kaupunki: unknown;
+  stad: unknown;
+  operaattor: unknown;
+  kapasiteet: unknown;
+  x: unknown;
+  y: unknown;
+}
 
 export interface IStationAttribute {
   stationId: number;
