@@ -1,5 +1,5 @@
-import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
-import { useMemo } from 'react';
+import { GoogleMap, MarkerF, useLoadScript } from '@react-google-maps/api';
+// import { useMemo } from 'react';
 
 interface IMapProps {
   posX: number;
@@ -10,7 +10,8 @@ const Map = ({ posX, posY }: IMapProps) => {
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY as string,
   });
-  const center = useMemo(() => ({ lng: posX, lat: posY }), []);
+  //const center = useMemo(() => ({ lng: posX, lat: posY }), []);
+  const location = { lng: posX, lat: posY };
 
   return (
     <div className="map">
@@ -19,10 +20,10 @@ const Map = ({ posX, posY }: IMapProps) => {
       ) : (
         <GoogleMap
           mapContainerClassName="map-container"
-          center={center}
-          zoom={13}
+          center={location}
+          zoom={14}
         >
-          <Marker position={{ lng: posX, lat: posY }} />
+          <MarkerF position={location} />
         </GoogleMap>
       )}
     </div>
