@@ -357,11 +357,17 @@ export const listAllCSVFiles = async () => {
  * Log error message to file
  * @param err
  */
-const logErrorMessage = (err: unknown) => {
+export const logErrorMessage = (err: unknown | string) => {
+  let errorMessage = '';
   if (err instanceof Error) {
-    void (async () => {
-      console.log(err.message);
-      await logEvents(err.message);
-    })();
+    errorMessage = err.message;
   }
+
+  if (typeof err === 'string') {
+    errorMessage = err;
+  }
+
+  void (async () => {
+    await logEvents(errorMessage);
+  })();
 };

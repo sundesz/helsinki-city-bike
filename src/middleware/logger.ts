@@ -11,7 +11,7 @@ const logEvents = async (message: string, logFileName = '') => {
     ? logFileName
     : dateTime.toISOString().substring(0, 10);
 
-  const logItem = `${dateTime.toISOString()}\t${message}${logFileName}`;
+  const logItem = `${dateTime.toISOString()}\t${message}`;
 
   try {
     if (!fs.existsSync(path.join(__dirname, '..', 'logs'))) {
