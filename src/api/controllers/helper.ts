@@ -46,3 +46,12 @@ export const secondsToHour = (sec: number): string => {
   const sDisplay = s > 0 ? `${s}s` : '';
   return `${hDisplay}${mDisplay}${sDisplay}`;
 };
+
+/**
+ * Get date in second
+ * @param date
+ * @returns
+ */
+export const getDateInSecond = (date: string) => {
+  return new Date(date).getTime() / 1000;
+};
