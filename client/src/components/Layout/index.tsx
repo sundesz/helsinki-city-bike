@@ -1,16 +1,15 @@
 import { Container } from 'react-bootstrap';
+import { Outlet } from 'react-router-dom';
 import Footer from './Footer';
 import Header from './Header';
 
-interface ILayoutProps {
-  children: JSX.Element;
-}
-
-const Layout = ({ children }: ILayoutProps) => {
+const Layout = () => {
   return (
     <Container>
       <Header />
-      <main className="my-2 viewport-height-50">{children}</main>
+      <main className="my-2 viewport-height-50">
+        <Outlet />
+      </main>
       <Footer />
     </Container>
   );
