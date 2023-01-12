@@ -46,6 +46,19 @@ export interface IJourneyCSVRow {
   'duration (sec.)': unknown;
 }
 
+export interface INewJourneyField {
+  departureStationId: unknown;
+  departureDateTime: unknown;
+  returnStationId?: unknown;
+  returnDateTime?: unknown;
+  distanceCovered?: unknown;
+}
+
+export type UpdateJourneyFieldType = Partial<
+  Pick<INewJourneyField, 'departureStationId' | 'departureDateTime'>
+> &
+  Required<Omit<INewJourneyField, 'departureStationId' | 'departureDateTime'>>;
+
 export interface INewJourney {
   departureStationId: number;
   departureDateTime: string;
@@ -53,3 +66,8 @@ export interface INewJourney {
   returnDateTime: string;
   distanceCovered: number;
 }
+
+export type UpdateJourneyType = Partial<
+  Pick<INewJourney, 'departureStationId' | 'departureDateTime'>
+> &
+  Required<Omit<INewJourney, 'departureStationId' | 'departureDateTime'>>;

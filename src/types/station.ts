@@ -46,16 +46,11 @@ export interface IStationCSVRow {
   y: unknown;
 }
 
-export interface IStationAttribute {
+interface IBaseStationField {
   stationId: number;
-  fid: number;
-  nameEn: string;
   nameFi: string;
-  nameSe: string;
   addressFi: string;
-  addressSe: string;
   cityFi: string;
-  citySe: string;
   operator: string;
   capacity: number;
   posX: number;
@@ -64,7 +59,19 @@ export interface IStationAttribute {
   updatedAt?: string;
 }
 
-export interface INewStation {
+interface IOptionalStationField {
+  fid?: number;
+  nameEn?: string;
+  nameSe?: string;
+  addressSe?: string;
+  citySe?: string;
+}
+
+export type IStationAttribute = IBaseStationField & IOptionalStationField;
+
+export type StationInputType = Omit<IStationAttribute, 'stationId'>;
+
+export interface INewStationField {
   fid?: unknown;
   nameEn?: unknown;
   nameFi: unknown;
@@ -73,10 +80,15 @@ export interface INewStation {
   addressSe?: unknown;
   cityFi: unknown;
   citySe?: unknown;
-  operator?: unknown;
+  operator: unknown;
   capacity: unknown;
   posX: unknown;
   posY: unknown;
 }
 
-export type StationInputType = Omit<IStationAttribute, 'stationId'>;
+export type NewStationType = Omit<IBaseStationField, 'stationId'> &
+  IOptionalStationField;
+
+export type UpdateStationFieldType = Partial<INewStationField>;
+
+export type UpdateStationType = Partial<NewStationType>;
