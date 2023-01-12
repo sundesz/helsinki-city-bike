@@ -1,9 +1,10 @@
 import { NextFunction, RequestHandler } from 'express';
 import { Op } from 'sequelize';
 import Journey from '../../db/models/journey_list';
-import Station from '../../db/models/station_list';
-import { INewJourney } from '../../types/journey';
+import { INewJourneyField, UpdateJourneyFieldType } from '../../types/journey';
+import { toNewJourney, toUpdateJourney } from '../../utils';
 import { getDateInSecond, getPagination, getPagingData } from './helper';
+import { getStationData } from './stationController';
 
 /**
  * Get a data of a station
@@ -77,26 +78,24 @@ const getAll: RequestHandler = async (req, res, next: NextFunction) => {
 };
 
 /**
- *
+ * Create a station
  */
 const create: RequestHandler = async (req, res, next: NextFunction) => {
   try {
+    const body = req.body as INewJourneyField;
+
     const {
       departureStationId,
       departureDateTime,
       returnStationId,
       returnDateTime,
       distanceCovered,
-    } = req.body as INewJourney;
+    } = toNewJourney(body);
 
-    const stationData = await Station.findAll({
-      where: { stationId: { [Op.in]: [departureStationId, returnStationId] } },
-    });
-
-    // check if both departure station and return station exists
-    if (stationData.length != 2) {
-      throw new Error('Station not found');
-    }
+    const { departureStation, returnStation } = await getStationData(
+      departureStationId,
+      returnStationId
+    );
 
     const journeyExists = await Journey.findOne({
       where: {
@@ -112,26 +111,69 @@ const create: RequestHandler = async (req, res, next: NextFunction) => {
       throw new Error('Journey detail already exits');
     }
 
-    const departureStation = stationData.find(
-      (station) => station.stationId === departureStationId
-    );
-    const returnStation = stationData.find(
-      (station) => station.stationId === returnStationId
-    );
-
     const journey = await Journey.create({
-      departureStationId: departureStation?.dataValues.stationId as number,
-      departureStationName: departureStation?.dataValues.nameFi as string,
+      departureStationId: departureStation!.dataValues.stationId,
+      departureStationName: departureStation!.dataValues.nameFi,
       departureDateTime,
-      returnStationId: returnStation?.dataValues.stationId as number,
-      returnStationName: returnStation?.dataValues.nameFi as string,
+      returnStationId: returnStation!.dataValues.stationId,
+      returnStationName: returnStation!.dataValues.nameFi,
       returnDateTime,
       duration:
         getDateInSecond(returnDateTime) - getDateInSecond(departureDateTime),
       distanceCovered,
     });
-    res.json({ journey });
+    res.json({ ...journey.dataValues });
   } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Update a station
+ * @param res
+ * @param req
+ * @param next
+ */
+const update: RequestHandler = async (req, res, next: NextFunction) => {
+  try {
+    const { id: journeyId } = req.params as { id: string };
+    const dataBeforeUpdate = toUpdateJourney(
+      req.body as UpdateJourneyFieldType
+    );
+
+    const isJourneyExists = await Journey.findByPk(journeyId);
+
+    if (!isJourneyExists) {
+      throw new Error('Station not found');
+    }
+
+    const departureStationId = dataBeforeUpdate.departureStationId ?? 0;
+    const returnStationId = dataBeforeUpdate.returnStationId;
+    const departureDateTime =
+      dataBeforeUpdate.departureDateTime ?? isJourneyExists.departureDateTime;
+
+    const { departureStation, returnStation } = await getStationData(
+      departureStationId,
+      returnStationId
+    );
+
+    isJourneyExists.returnStationId = dataBeforeUpdate.returnStationId;
+    isJourneyExists.returnStationName = returnStation!.dataValues.nameFi;
+    isJourneyExists.returnDateTime = dataBeforeUpdate.returnDateTime;
+    isJourneyExists.duration =
+      getDateInSecond(dataBeforeUpdate.returnDateTime) -
+      getDateInSecond(departureDateTime);
+    isJourneyExists.departureStationId =
+      dataBeforeUpdate.departureStationId ?? isJourneyExists.departureStationId;
+    isJourneyExists.departureStationName = dataBeforeUpdate.departureStationId
+      ? departureStation!.dataValues.nameFi
+      : isJourneyExists.departureStationName;
+    isJourneyExists.departureDateTime = departureDateTime;
+
+    await isJourneyExists.save();
+
+    res.json(isJourneyExists);
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -140,4 +182,5 @@ export default {
   getOne,
   getAll,
   create,
+  update,
 };

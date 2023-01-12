@@ -3,9 +3,41 @@ import { Op } from 'sequelize';
 import { sequelize } from '../../db';
 import Journey from '../../db/models/journey_list';
 import Station from '../../db/models/station_list';
-import { INewStation } from '../../types/station';
-import { parseNumber, parseString } from '../../utils';
+import { INewStationField, UpdateStationFieldType } from '../../types/station';
+import { toNewStation, toUpdateStation } from '../../utils';
 import { getPagination, getPagingData } from './helper';
+
+/**
+ * Helper function for Journey to get departure stationid and return station id
+ * @param departureStationId
+ * @param returnStationId
+ * @returns
+ */
+export const getStationData = async (
+  departureStationId: number,
+  returnStationId: number
+) => {
+  const stationData = await Station.findAll({
+    where: { stationId: { [Op.in]: [departureStationId, returnStationId] } },
+  });
+
+  // count the number of stationId (departurestationid and returnstationid)
+  const countIds = departureStationId ? 2 : 1;
+
+  // check if both departure station and return station exists
+  if (stationData.length != countIds) {
+    throw new Error('Station not found');
+  }
+
+  const departureStation = departureStationId
+    ? stationData.find((station) => station.stationId === departureStationId)
+    : undefined;
+  const returnStation = stationData.find(
+    (station) => station.stationId === returnStationId
+  );
+
+  return { departureStation, returnStation };
+};
 
 /**
  * Get the average distance covered from the station
@@ -59,7 +91,7 @@ export const getTopFiveStation = async (
 };
 
 /**
- *
+ * Get station list (id and name)
  * @param req
  * @param res
  * @param next
@@ -208,70 +240,64 @@ const getAll: RequestHandler = async (req, res, next: NextFunction) => {
 };
 
 /**
- *
+ * Create a station
  * @param req
  * @param res
  * @param next
  */
 const create: RequestHandler = async (req, res, next: NextFunction) => {
   try {
-    const {
-      fid,
-      nameEn,
-      nameFi,
-      nameSe,
-      addressFi,
-      addressSe,
-      cityFi,
-      citySe,
-      operator,
-      capacity,
-      posX,
-      posY,
-    } = req.body as INewStation;
+    const dataBeforeCreate = toNewStation(req.body as INewStationField);
 
-    console.log(req.body);
-
-    const positionX = posX ? parseNumber(posX) : 0;
-    const positionY = posY ? parseNumber(posY) : 0;
-    const name = nameFi ? parseString(nameFi) : '';
-    const city = cityFi ? parseString(cityFi) : '';
-    const address = addressFi ? parseString(addressFi) : '';
-
-    // check if required field have value or not
-    if (!positionX || !positionY || !name || !city || !address) {
-      throw new Error(
-        'Fields nameFi, cityFi, addressFi, posX and posY are required'
-      );
-    }
+    // // check if required field have value or not
+    // if (!dataBeforeCreate.posX || !dataBeforeCreate.posY || !dataBeforeCreate.name || !dataBeforeCreate.city || !dataBeforeCreate.address) {
+    //   throw new Error(
+    //     'Fields nameFi, cityFi, addressFi, posX and posY are required'
+    //   );
+    // }
 
     // check if station already exists
     const checkStation = await Station.findOne({
-      where: { posX: positionX, posY: positionY },
+      where: { posX: dataBeforeCreate.posX, posY: dataBeforeCreate.posY },
     });
 
     if (checkStation) {
       throw new Error('Station already exists');
     }
 
-    const station = await Station.create({
-      fid: fid ? parseNumber(fid) : 0,
-      nameEn: nameEn ? parseString(nameEn) : '',
-      nameFi: name,
-      nameSe: nameSe ? parseString(nameSe) : '',
-      addressFi: address,
-      addressSe: addressSe ? parseString(addressSe) : '',
-      cityFi: city,
-      citySe: citySe ? parseString(citySe) : '',
-      operator: operator ? parseString(operator) : '',
-      capacity: parseNumber(capacity),
-      posX: positionX,
-      posY: positionY,
-    });
+    const station = await Station.create({ ...dataBeforeCreate });
 
-    res.json(station);
+    res.json({ ...station.dataValues });
   } catch (error: unknown) {
     return next(error);
+  }
+};
+
+/**
+ * Update a station
+ * @param req
+ * @param res
+ * @param next
+ */
+const update: RequestHandler = async (req, res, next: NextFunction) => {
+  try {
+    const { id: stationId } = req.params as { id: string };
+    const dataBeforeUpdate = toUpdateStation(
+      req.body as UpdateStationFieldType
+    );
+
+    const updatedStation = await Station.update(
+      { ...dataBeforeUpdate },
+      { where: { stationId }, returning: true }
+    );
+
+    if (updatedStation[0]) {
+      res.json(updatedStation[1][0]);
+    } else {
+      res.status(404).end();
+    }
+  } catch (error: unknown) {
+    next(error);
   }
 };
 
@@ -280,4 +306,5 @@ export default {
   getAll,
   getStationList,
   create,
+  update,
 };
