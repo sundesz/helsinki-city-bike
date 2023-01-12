@@ -64,4 +64,19 @@ export interface IStationAttribute {
   updatedAt?: string;
 }
 
+export interface INewStation {
+  fid?: unknown;
+  nameEn?: unknown;
+  nameFi: unknown;
+  nameSe?: unknown;
+  addressFi: unknown;
+  addressSe?: unknown;
+  cityFi: unknown;
+  citySe?: unknown;
+  operator?: unknown;
+  capacity: unknown;
+  posX: unknown;
+  posY: unknown;
+}
+
 export type StationInputType = Omit<IStationAttribute, 'stationId'>;

@@ -45,3 +45,11 @@ export interface IJourneyCSVRow {
   'covered distance (m)': unknown;
   'duration (sec.)': unknown;
 }
+
+export interface INewJourney {
+  departureStationId: number;
+  departureDateTime: string;
+  returnStationId: number;
+  returnDateTime: string;
+  distanceCovered: number;
+}
