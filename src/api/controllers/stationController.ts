@@ -103,7 +103,7 @@ const getStationList: RequestHandler = async (
 ) => {
   try {
     const stations = await Station.findAll({
-      attributes: ['stationId', ['name_fi', 'name']],
+      attributes: ['stationId', 'nameFi'],
       where: { nameFi: { [Op.ne]: '' } },
       order: [['nameFi', 'asc']],
     });
