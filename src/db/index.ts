@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { ConnectionError, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { DB_HOST, DB_NAME, DB_USER } from '../config';
 import { logErrorMessage } from '../utils';
@@ -12,7 +12,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USER, 'admin', {
     //   rejectUnauthorized: false,
     // },
   },
-  logging: console.log, // disable logging; default: console.log
+  logging: process.env.NODE_ENV === 'production' ? false : console.log, // disable logging; default: console.log
 });
 
 const migrationConf = {
@@ -55,7 +55,10 @@ export const connectToDB = async () => {
 
     console.log('Database connected');
   } catch (error: unknown) {
-    logErrorMessage(error);
+    error instanceof ConnectionError
+      ? logErrorMessage(error.message)
+      : logErrorMessage(error);
+
     console.log('Connecting to database failed: ', error);
     return process.exit(1);
   }
