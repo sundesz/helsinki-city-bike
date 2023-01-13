@@ -1,47 +1,84 @@
-import { Stack } from 'react-bootstrap';
+import { Button, Stack } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
-const JourneyFilter = () => {
+interface IJourneyFilterProps {
+  filterText: string;
+  filterColumn: string;
+  setFilterText: (value: React.SetStateAction<string>) => void;
+  setFilterColumn: (value: React.SetStateAction<string>) => void;
+  setPage: (value: React.SetStateAction<number>) => void;
+}
+
+const JourneyFilter = ({
+  filterText,
+  filterColumn,
+  setFilterText,
+  setFilterColumn,
+  setPage,
+}: IJourneyFilterProps) => {
+  const navigate = useNavigate();
+
+  const filterSelectHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilterColumn(() => e.target.value);
+
+    if (filterText.trim()) {
+      setPage(1);
+      navigate({
+        pathname: '/journey',
+        search: `?name=${e.target.value}&value=${filterText}`,
+      });
+    }
+  };
+
+  const filterInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterText(() => e.target.value);
+  };
+
+  const filterInputKeyDownHandler = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === 'Enter' && filterColumn) {
+      setPage(1);
+      navigate({
+        pathname: '/journey',
+        search: `?name=${filterColumn}&value=${filterText}`,
+      });
+    }
+  };
+
   return (
-    <div className="border rounded p-3">
-      <Stack direction="horizontal" gap={3}>
-        <div className="input-group mb-3">
-          <span className="input-group-text">🔍</span>
+    <Stack
+      direction="horizontal"
+      gap={3}
+      className="border rounded p-3 search-filter"
+    >
+      <Button variant="primary" onClick={() => navigate('/station/new')}>
+        Create new
+      </Button>
+      <div className="input-group">
+        <span className="input-group-text">🔍</span>
 
-          <select
-            className="form-select"
-            id="inputGroupSelect03"
-            aria-label="Example select with button addon"
-          >
-            <option value="1" selected>
-              Departure Station
-            </option>
-            <option value="2">Return Station</option>
-          </select>
+        <select
+          className="form-select"
+          id="inputGroupSelect03"
+          // defaultValue={2}
+          value={filterColumn}
+          onChange={filterSelectHandler}
+        >
+          <option value="departure_station_name">Departure Station</option>
+          <option value="return_station_name">Return Station</option>
+        </select>
 
-          <input
-            type="text"
-            className="form-control"
-            placeholder="search ..."
-          />
-        </div>
-
-        <div className="input-group mb-3">
-          <label className="input-group-text" htmlFor="inputGroupSelect01">
-            Order by
-          </label>
-          <select className="form-select" id="inputGroupSelect01">
-            <option value="1">Departure Date 🔺</option>
-            <option value="1">Departure Date 🔻</option>
-            <option value="1">Departure Station 🔺</option>
-            <option value="1">Departure Station 🔻</option>
-            <option value="1">Return Date 🔺</option>
-            <option value="1">Return Date 🔻</option>
-            <option value="1">Return Station 🔺</option>
-            <option value="1">Return Station 🔻</option>
-          </select>
-        </div>
-      </Stack>
-    </div>
+        <input
+          type="text"
+          className="form-control flex-2"
+          placeholder="search ..."
+          value={filterText}
+          onChange={filterInputChangeHandler}
+          onKeyDown={filterInputKeyDownHandler}
+        />
+      </div>
+    </Stack>
   );
 };
 

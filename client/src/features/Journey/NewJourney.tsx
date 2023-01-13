@@ -31,7 +31,9 @@ const NewJourney = () => {
   }
 
   if (!station) {
-    return <div>No station data </div>;
+    return (
+      <div>Please create atleast two station before creating the journey </div>
+    );
   }
 
   const selectStation = () => {
@@ -41,6 +43,8 @@ const NewJourney = () => {
       </option>
     ));
   };
+
+  // document.title = 'New Journey';
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,16 +99,6 @@ const NewJourney = () => {
       }
     }
   };
-
-  // const stationDetail = (prevValue: IJourneyDetail): IJourneyDetail => {
-  //   const stationId = prevValue.stationId
-  //     ? prevValue.stationId
-  //     : station[0].stationId.toString();
-  //   return {
-  //     stationId: stationIdCheck ? e.target.value : stationId,
-  //     dateTime: dateTimeCheck ? e.target.value : prevValue.dateTime,
-  //   };
-  // };
 
   const stationHandler = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>,

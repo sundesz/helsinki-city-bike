@@ -1,11 +1,14 @@
 import { Col, Container, Row, Stack, Table } from 'react-bootstrap';
 import { Link, useParams } from 'react-router-dom';
+import ErrorPage from '../../components/Layout/ErrorPage';
+import Loading from '../../components/Layout/Loading';
 import { IStationExtraInfo, ITopStation } from '../../types/station';
+import { meterToKm } from '../../utils';
 import Map from './Map';
 import { useGetSingleStationQuery } from './stationApiSlice';
 
 const SingleStation = () => {
-  const { stationId } = useParams();
+  const { stationId } = useParams() as { stationId: string };
 
   const {
     data: station,
@@ -15,12 +18,11 @@ const SingleStation = () => {
   } = useGetSingleStationQuery(stationId);
 
   if (isLoading) {
-    return <div>Loading ....</div>;
+    return <Loading />;
   }
 
   if (isError) {
-    console.log(error);
-    return null;
+    return <ErrorPage error={error} />;
   }
 
   if (!station?.data) {
@@ -69,7 +71,7 @@ const SingleStation = () => {
           </tr>
           <tr>
             <th>{name} average distance</th>
-            <td>{station?.avgDistance}</td>
+            <td>{station ? meterToKm(station.avgDistance) : ''}</td>
           </tr>
         </tbody>
       </Table>

@@ -1,28 +1,32 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import ErrorPage from '../../components/Layout/ErrorPage';
+import Loading from '../../components/Layout/Loading';
+import { useSearchQuery } from '../../hooks/useSearchQuery';
 import AppPagination from '../Pagination';
 import { useGetStationsQuery } from './stationApiSlice';
+import StationFilter from './StationFilter';
 import StationList from './StationList';
 
 const Station = () => {
-  const [searchParams] = useSearchParams();
-  const pageNumber = searchParams.get('page') ?? 1;
+  const { pageNumber, filterName, filterValue, orderBy, orderDir } =
+    useSearchQuery({ filterName: 'name_fi' });
 
   const [page, setPage] = useState<number>(Number(pageNumber));
+  const [filterColumn, setFilterColumn] = useState<string>(filterName);
+  const [filterText, setFilterText] = useState<string>(filterValue);
   const {
     data: stationData,
     isLoading,
     isError,
     error,
-  } = useGetStationsQuery(page);
+  } = useGetStationsQuery({ page, filterName, filterValue, orderBy, orderDir });
 
   if (isLoading) {
-    return <div>Loading ....</div>;
+    return <Loading />;
   }
 
   if (isError) {
-    console.log(error);
-    return null;
+    return <ErrorPage error={error} />;
   }
 
   if (!stationData?.data) {
@@ -31,7 +35,13 @@ const Station = () => {
 
   return (
     <>
-      {/* <JourneyFilter /> */}
+      <StationFilter
+        filterText={filterText}
+        filterColumn={filterColumn}
+        setFilterColumn={setFilterColumn}
+        setFilterText={setFilterText}
+        setPage={setPage}
+      />
 
       <AppPagination
         pageType="station"

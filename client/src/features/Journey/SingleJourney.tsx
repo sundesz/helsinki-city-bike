@@ -1,5 +1,79 @@
+import { Col, Container, Row } from 'react-bootstrap';
+import { Link, useParams } from 'react-router-dom';
+import ErrorPage from '../../components/Layout/ErrorPage';
+import Loading from '../../components/Layout/Loading';
+import { getDateInLocal, getUrl, meterToKm, secondsToHour } from '../../utils';
+import { useGetSingleJourneyQuery } from './journeyApiSlice';
+
 const SingleJourney = () => {
-  return <div>SingleJourney</div>;
+  const { journeyId } = useParams() as { journeyId: string };
+
+  const {
+    data: journey,
+    isError,
+    isLoading,
+    error,
+  } = useGetSingleJourneyQuery(journeyId);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ErrorPage error={error} />;
+  }
+
+  if (!journey?.data) {
+    return <div>No data </div>;
+  }
+
+  return (
+    <Container>
+      <h2>Journey detail</h2>
+      <br />
+      <Row>
+        <Col xs={1}>
+          <b>From :</b>
+        </Col>
+        <Col>
+          <Link
+            to={getUrl('station', journey.data.departureStationId.toString())}
+          >
+            {journey.data.departureStationName}
+          </Link>
+          <span className="px-3">at</span>
+          {getDateInLocal(journey.data.departureDateTime)}
+        </Col>
+      </Row>
+
+      <Row>
+        <Col xs={1}>
+          <b>To :</b>
+        </Col>
+        <Col>
+          <Link to={getUrl('station', journey.data.returnStationId.toString())}>
+            {journey.data.returnStationName}
+          </Link>
+          <span className="px-3">at</span>
+          {getDateInLocal(journey.data.returnDateTime)}
+        </Col>
+      </Row>
+
+      <Row>
+        <Col xs={1}>
+          <b>Distance :</b>
+        </Col>
+        <Col>{meterToKm(journey.data.distanceCovered)}</Col>
+      </Row>
+
+      <Row>
+        <Col xs={1}>
+          <b>Duration :</b>
+        </Col>
+        <Col>{secondsToHour(Number(journey.data.duration))}</Col>
+      </Row>
+    </Container>
+  );
 };
 
 export default SingleJourney;
