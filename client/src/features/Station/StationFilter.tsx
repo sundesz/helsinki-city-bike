@@ -59,7 +59,7 @@ const StationFilter = ({
       direction="horizontal"
       gap={3}
     >
-      <Button variant="primary" onClick={() => navigate('/journey/new')}>
+      <Button variant="primary" onClick={() => navigate('/station/new')}>
         Create new
       </Button>
 

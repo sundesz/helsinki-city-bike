@@ -59,7 +59,7 @@ const JourneyFilter = ({
       gap={3}
       className="border rounded p-3 search-filter"
     >
-      <Button variant="primary" onClick={() => navigate('/station/new')}>
+      <Button variant="primary" onClick={() => navigate('/journey/new')}>
         Create new
       </Button>
       <div className="input-group">
