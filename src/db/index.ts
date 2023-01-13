@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
 import { DB_HOST, DB_NAME, DB_USER } from '../config';
+import { logErrorMessage } from '../utils';
 
 export const sequelize = new Sequelize(DB_NAME, DB_USER, 'admin', {
   host: DB_HOST,
@@ -30,7 +31,8 @@ const runMigrations = async () => {
     console.log('Migrations upto date', {
       files: migrations.map((file) => file.name),
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    logErrorMessage(error);
     console.log('failed to migrate:', error);
   }
 };
@@ -40,7 +42,8 @@ export const rollbackMigrations = async () => {
     await sequelize.authenticate();
     const migrator = umzug;
     await migrator.down();
-  } catch (error) {
+  } catch (error: unknown) {
+    logErrorMessage(error);
     console.log('failed to rollback:', error);
   }
 };
@@ -51,7 +54,8 @@ export const connectToDB = async () => {
     await runMigrations();
 
     console.log('Database connected');
-  } catch (error) {
+  } catch (error: unknown) {
+    logErrorMessage(error);
     console.log('Connecting to database failed: ', error);
     return process.exit(1);
   }

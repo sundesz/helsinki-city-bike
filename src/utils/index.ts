@@ -325,7 +325,10 @@ export const readFile = (fileName: string) => {
         },
       })
     )
-    .on('error', (error) => console.log(error))
+    .on('error', (error: unknown) => {
+      logErrorMessage(error);
+      console.log(error);
+    })
     .on('data', (row) => {
       if (fileType === undefined) {
         return;

@@ -1,5 +1,6 @@
 import { DataTypes, Sequelize } from 'sequelize';
 import { Migration } from '..';
+import { logErrorMessage } from '../../utils';
 
 export const up: Migration = async ({ context: queryInterface }) => {
   try {
@@ -44,7 +45,8 @@ export const up: Migration = async ({ context: queryInterface }) => {
         allowNull: false,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    logErrorMessage(error);
     console.log(error);
   }
 };
@@ -52,7 +54,9 @@ export const up: Migration = async ({ context: queryInterface }) => {
 export const down: Migration = async ({ context: QueryInterface }) => {
   try {
     await QueryInterface.dropTable('journey_list');
-  } catch (error) {
+  } catch (error: unknown) {
+    logErrorMessage(error);
+
     console.log(error);
   }
 };

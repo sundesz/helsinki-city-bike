@@ -2,7 +2,7 @@ import http from 'http';
 import app from './app';
 import { PORT } from './config';
 import { connectToDB } from './db';
-import { listAllCSVFiles } from './utils';
+import { listAllCSVFiles, logErrorMessage } from './utils';
 
 const server = http.createServer(app);
 
@@ -15,7 +15,8 @@ const start = async () => {
     server.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    logErrorMessage(error);
     console.log(error);
   }
 };
