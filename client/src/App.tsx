@@ -9,6 +9,7 @@ import Station from './features/Station';
 import SingleStation from './features/Station/SingleStation';
 import 'react-toastify/dist/ReactToastify.css';
 import NewStation from './features/Station/NewStation';
+import Page404 from './components/Layout/Page404';
 
 const App = () => {
   return (
@@ -30,6 +31,8 @@ const App = () => {
             <Route path="new" element={<NewJourney />} />
             <Route path=":journeyId" element={<SingleJourney />} />
           </Route>
+
+          <Route path="*" element={<Page404 />} />
         </Route>
       </Routes>
     </Router>
