@@ -10,11 +10,11 @@ export type PageType = 'journey' | 'station';
 export type JourneyType = 'departure' | 'return';
 
 export interface IGetAllRequestQuery {
-  page: number | void;
-  orderBy: string | void;
-  orderDir: string | void;
-  filterName: string | void;
-  filterValue: string | void;
+  page?: number | void;
+  orderBy?: string | void;
+  orderDir?: string | void;
+  filterName?: string | void;
+  filterValue?: string | void;
 }
 
 export interface IOrderAndFilter {
