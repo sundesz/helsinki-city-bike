@@ -1,2 +1,62 @@
-#GET
-http://localhost:8080/api/v1/journey
+###
+GET http://localhost:8080/api/v1/station
+
+###
+GET http://localhost:8080/api/v1/station/list
+
+
+###
+PUT http://localhost:8080/api/v1/station
+Content-Type: application/json
+
+{
+  "nameFi": "Sandesh bas bisaune 1",
+  "addressFi": "Sandesh marg",
+  "cityFi": "Helsinki",
+  "operator": "Sandesh yatayat",
+  "capacity": "50",
+  "posX": 24.840,
+  "posY": 60.13658
+}
+
+###
+POST http://localhost:8080/api/v1/station/921
+Content-Type: application/json
+
+{
+  "nameFi": "Sandesh bas bisaune 1",
+  "addressFi": "Sandesh marg",
+  "cityFi": "Helsinki",
+  "operator": "Sandesh yatayat",
+  "capacity": "50",
+  "posX": 24.84055,
+  "posY": 60.1658
+}
+
+
+###
+GET http://localhost:8080/api/v1/journey
+
+
+###
+POST http://localhost:8080/api/v1/journey
+Content-Type: application/json
+
+{
+  "departureStationId": 922,
+  "departureDateTime": "2023-01-10T22:53:06.675Z",
+  "returnStationId": 161,
+  "returnDateTime": "2023-01-10T22:53:16.675Z",
+  "distanceCovered": 500
+}
+
+###
+PUT http://localhost:8080/api/v1/journey/208d5c0c-1d07-407f-8c08-b1fc807c5390
+Content-Type: application/json
+
+{
+  "departureStationId": 16,
+  "returnStationId": 161,
+  "returnDateTime": "2023-01-10T22:59:16.675Z",
+  "distanceCovered": 50
+}
