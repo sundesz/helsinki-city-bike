@@ -8,13 +8,13 @@ const Home = () => {
       <div className="text-center mb-5">
         <ListGroup>
           <ListGroup.Item>
-            <Link to={'/journey'}>List all Journey</Link>
+            <Link to={'/journey'}>See all Journey</Link>
           </ListGroup.Item>
           <ListGroup.Item>
             <Link to={'/journey/new'}>Create new journey</Link>
           </ListGroup.Item>
           <ListGroup.Item>
-            <Link to={'/station'}>List all Station</Link>
+            <Link to={'/station'}>See all Station</Link>
           </ListGroup.Item>
           <ListGroup.Item>
             <Link to={'/station/new'}>Create new station</Link>
