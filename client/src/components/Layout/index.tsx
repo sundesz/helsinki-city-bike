@@ -4,6 +4,8 @@ import Footer from './Footer';
 import Header from './Header';
 
 const Layout = () => {
+  document.title = 'HSL Bike app';
+
   return (
     <Container>
       <Header />
