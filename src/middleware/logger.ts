@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { NextFunction, RequestHandler } from 'express';
+import { SRC_DIR } from '..';
 
 const fsPromises = fs.promises;
 
@@ -14,12 +15,12 @@ const logEvents = async (message: string, logFileName = '') => {
   const logItem = `${dateTime.toISOString()}\t${message}`;
 
   try {
-    if (!fs.existsSync(path.join(__dirname, '..', 'logs'))) {
-      await fsPromises.mkdir(path.join(__dirname, '..', 'logs'));
+    if (!fs.existsSync(path.join(SRC_DIR, '..', 'logs'))) {
+      await fsPromises.mkdir(path.join(SRC_DIR, '..', 'logs'));
     }
 
     await fsPromises.appendFile(
-      path.join(__dirname, '..', 'logs', `${logFileName}.log`),
+      path.join(SRC_DIR, '..', 'logs', `${logFileName}.log`),
       `\n${logItem}`
     );
   } catch (error) {
