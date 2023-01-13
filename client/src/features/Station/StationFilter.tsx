@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Button, Stack } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,32 +18,38 @@ const StationFilter = ({
   setPage,
 }: IStationFilterProps) => {
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const filterSelectHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterColumn(() => e.target.value);
+    const searchValue = inputRef.current!.value;
+
+    if (searchValue !== filterText) {
+      setFilterText(() => searchValue);
+    }
+
     if (filterText.trim()) {
       setPage(() => 1);
       navigate({
         pathname: '/station',
-        search: `?name=${e.target.value}&value=${filterText}&orderBy=&orderDir=`,
+        search: `?name=${e.target.value}&value=${filterText}`,
       });
     }
-  };
-
-  const filterInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterText(() => e.target.value);
   };
 
   const filterInputKeyDownHandler = (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
+    const searchValue = inputRef.current!.value;
+    setFilterText(() => searchValue);
+
     if (e.key === 'Enter' && filterColumn) {
       setPage(() => 1);
+
       navigate({
         pathname: '/station',
-        search: `?&name=${filterColumn}&value=${filterText}&orderBy=&orderDir=`,
+        search: `?name=${filterColumn}&value=${searchValue}`,
       });
-      e.preventDefault();
     }
   };
 
@@ -62,7 +69,6 @@ const StationFilter = ({
         <select
           className="form-select"
           id="inputGroupSelect03"
-          // defaultValue={2}
           value={filterColumn}
           onChange={filterSelectHandler}
         >
@@ -75,8 +81,8 @@ const StationFilter = ({
           type="text"
           className="form-control flex-2"
           placeholder="search ..."
-          value={filterText}
-          onChange={filterInputChangeHandler}
+          defaultValue={filterText}
+          ref={inputRef}
           onKeyDown={filterInputKeyDownHandler}
         />
       </div>

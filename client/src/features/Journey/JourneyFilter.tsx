@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Button, Stack } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,12 +18,18 @@ const JourneyFilter = ({
   setPage,
 }: IJourneyFilterProps) => {
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const filterSelectHandler = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFilterColumn(() => e.target.value);
+    const searchValue = inputRef.current!.value;
+
+    if (searchValue !== filterText) {
+      setFilterText(() => searchValue);
+    }
 
     if (filterText.trim()) {
-      setPage(1);
+      setPage(() => 1);
       navigate({
         pathname: '/journey',
         search: `?name=${e.target.value}&value=${filterText}`,
@@ -30,18 +37,18 @@ const JourneyFilter = ({
     }
   };
 
-  const filterInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterText(() => e.target.value);
-  };
-
   const filterInputKeyDownHandler = (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
+    const searchValue = inputRef.current!.value;
+    setFilterText(() => searchValue);
+
     if (e.key === 'Enter' && filterColumn) {
-      setPage(1);
+      setPage(() => 1);
+
       navigate({
         pathname: '/journey',
-        search: `?name=${filterColumn}&value=${filterText}`,
+        search: `?name=${filterColumn}&value=${searchValue}`,
       });
     }
   };
@@ -61,7 +68,6 @@ const JourneyFilter = ({
         <select
           className="form-select"
           id="inputGroupSelect03"
-          // defaultValue={2}
           value={filterColumn}
           onChange={filterSelectHandler}
         >
@@ -73,8 +79,8 @@ const JourneyFilter = ({
           type="text"
           className="form-control flex-2"
           placeholder="search ..."
-          value={filterText}
-          onChange={filterInputChangeHandler}
+          ref={inputRef}
+          defaultValue={filterText}
           onKeyDown={filterInputKeyDownHandler}
         />
       </div>
