@@ -2,7 +2,8 @@ import http from 'http';
 import app from './app';
 import { PORT } from './config';
 import { connectToDB } from './db';
-import { listAllCSVFiles, logErrorMessage } from './utils';
+import { logErrorMessage } from './utils';
+import { listAllCSVFiles } from './utils/csv';
 
 const server = http.createServer(app);
 
