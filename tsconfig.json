@@ -10,5 +10,14 @@
     "noImplicitAny": false,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "./node_modules",
+    "./node_modules/*",
+    "dist",
+    "client",
+    "./client",
+    "./client/*"
+  ]
 }
