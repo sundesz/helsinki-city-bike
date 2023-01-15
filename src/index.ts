@@ -22,7 +22,7 @@ const start = async () => {
     });
   } catch (error: unknown) {
     logErrorMessage(error);
-    // console.log(error);
+    console.log(error);
   }
 };
 
