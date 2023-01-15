@@ -43,11 +43,11 @@ const NewStation = () => {
       let key: keyof typeof station;
       for (key in station) {
         if (!station[key]) {
-          toast.warning('All fields are required');
+          toast.warning('All fields are required.');
           return;
         }
         if (key === 'coordinates' && !checkCoordinate(station[key])) {
-          toast.warning('Invalid coordinates');
+          toast.warning('Invalid coordinates.');
           return;
         }
       }
@@ -55,20 +55,20 @@ const NewStation = () => {
       const { coordinates, ...newStationData } = station;
       const position: string[] = coordinates.split(',');
 
-      const NewStation = await createStation({
+      const newStation = await createStation({
         ...newStationData,
         posX: Number(position[0]),
         posY: Number(position[1]),
       });
 
-      if ('data' in NewStation) {
+      if ('data' in newStation) {
         toast.success('Station created successfully');
         setStation(() => initValue);
       }
 
-      if ('error' in NewStation) {
-        console.log(NewStation.error);
-        toast.error('Station cannot be created.');
+      if ('error' in newStation) {
+        const err = newStation.error as { data: { error: string } };
+        toast.error(err.data.error);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -83,95 +83,107 @@ const NewStation = () => {
   };
 
   return (
-    <Form onSubmit={submitHandler}>
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm="2">
-          Name:
-        </Form.Label>
-        <Col sm="8">
-          <Form.Control
-            name="nameFi"
-            value={station.nameFi}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              stationChangeHandler(e)
-            }
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm="2">
-          Address:
-        </Form.Label>
-        <Col sm="8">
-          <Form.Control
-            name="addressFi"
-            value={station.addressFi}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              stationChangeHandler(e)
-            }
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm="2">
-          City:
-        </Form.Label>
-        <Col sm="8">
-          <Form.Control
-            name="cityFi"
-            value={station.cityFi}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              stationChangeHandler(e)
-            }
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm="2">
-          Operator:
-        </Form.Label>
-        <Col sm="8">
-          <Form.Control
-            name="operator"
-            value={station.operator}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              stationChangeHandler(e)
-            }
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm="2">
-          Capacity:
-        </Form.Label>
-        <Col sm="8">
-          <Form.Control
-            name="capacity"
-            type="number"
-            value={station.capacity}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              stationChangeHandler(e)
-            }
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="mb-3">
-        <Form.Label column sm="2">
-          Location Coordinate(x,y):
-        </Form.Label>
-        <Col sm="8">
-          <Form.Control
-            name="coordinates"
-            value={station.coordinates}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              stationChangeHandler(e)
-            }
-          />
-        </Col>
-      </Form.Group>
+    <>
+      <div className="page-header">Create new station</div>
 
-      <Button type="submit">Save</Button>
-    </Form>
+      <Form onSubmit={submitHandler}>
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">
+            Name:
+          </Form.Label>
+          <Col sm="8">
+            <Form.Control
+              id="nameFi"
+              name="nameFi"
+              value={station.nameFi}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                stationChangeHandler(e)
+              }
+            />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">
+            Address:
+          </Form.Label>
+          <Col sm="8">
+            <Form.Control
+              id="addressFi"
+              name="addressFi"
+              value={station.addressFi}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                stationChangeHandler(e)
+              }
+            />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">
+            City:
+          </Form.Label>
+          <Col sm="8">
+            <Form.Control
+              id="cityFi"
+              name="cityFi"
+              value={station.cityFi}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                stationChangeHandler(e)
+              }
+            />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">
+            Operator:
+          </Form.Label>
+          <Col sm="8">
+            <Form.Control
+              id="operator"
+              name="operator"
+              value={station.operator}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                stationChangeHandler(e)
+              }
+            />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">
+            Capacity:
+          </Form.Label>
+          <Col sm="8">
+            <Form.Control
+              id="capacity"
+              name="capacity"
+              type="number"
+              value={station.capacity}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                stationChangeHandler(e)
+              }
+            />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} className="mb-3">
+          <Form.Label column sm="2">
+            Location Coordinate(x,y):
+          </Form.Label>
+          <Col sm="8">
+            <Form.Control
+              id="coordinates"
+              name="coordinates"
+              value={station.coordinates}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                stationChangeHandler(e)
+              }
+            />
+          </Col>
+        </Form.Group>
+
+        <Button id="save" type="submit">
+          Save
+        </Button>
+      </Form>
+    </>
   );
 };
 

@@ -59,7 +59,11 @@ const JourneyFilter = ({
       gap={3}
       className="border rounded p-3 search-filter"
     >
-      <Button variant="primary" onClick={() => navigate('/journey/new')}>
+      <Button
+        id="createNew"
+        variant="primary"
+        onClick={() => navigate('/journey/new')}
+      >
         Create new
       </Button>
       <div className="input-group">
@@ -67,7 +71,7 @@ const JourneyFilter = ({
 
         <select
           className="form-select"
-          id="inputGroupSelect03"
+          id="filterName"
           value={filterColumn}
           onChange={filterSelectHandler}
         >
@@ -76,6 +80,7 @@ const JourneyFilter = ({
         </select>
 
         <input
+          id="filterValue"
           type="text"
           className="form-control flex-2"
           placeholder="search ..."

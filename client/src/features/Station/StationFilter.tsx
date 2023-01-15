@@ -59,7 +59,11 @@ const StationFilter = ({
       direction="horizontal"
       gap={3}
     >
-      <Button variant="primary" onClick={() => navigate('/station/new')}>
+      <Button
+        id="createNew"
+        variant="primary"
+        onClick={() => navigate('/station/new')}
+      >
         Create new
       </Button>
 
@@ -68,7 +72,7 @@ const StationFilter = ({
 
         <select
           className="form-select"
-          id="inputGroupSelect03"
+          id="filterName"
           value={filterColumn}
           onChange={filterSelectHandler}
         >
@@ -78,6 +82,7 @@ const StationFilter = ({
         </select>
 
         <input
+          id="filterValue"
           type="text"
           className="form-control flex-2"
           placeholder="search ..."
