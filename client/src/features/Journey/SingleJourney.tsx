@@ -1,11 +1,12 @@
-import { Col, Container, Row } from 'react-bootstrap';
-import { Link, useParams } from 'react-router-dom';
+import { Col, Container, Row, Stack } from 'react-bootstrap';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import ErrorPage from '../../components/Layout/ErrorPage';
 import Loading from '../../components/Layout/Loading';
 import { getDateInLocal, getUrl, meterToKm, secondsToHour } from '../../utils';
 import { useGetSingleJourneyQuery } from './journeyApiSlice';
 
 const SingleJourney = () => {
+  const navigate = useNavigate();
   const { journeyId } = useParams() as { journeyId: string };
 
   const {
@@ -29,11 +30,17 @@ const SingleJourney = () => {
 
   return (
     <Container>
-      <h2>Journey detail</h2>
+      <Stack direction="horizontal" className="justify-content-between">
+        <div className="page-header">Journey detail</div>
+        <div onClick={() => navigate(-1)} className="go-back">
+          &#8249; Go back
+        </div>
+      </Stack>
+
       <br />
       <Row>
-        <Col xs={1}>
-          <b>From :</b>
+        <Col xs={3}>
+          <b>Departure from :</b>
         </Col>
         <Col>
           <Link
@@ -47,8 +54,8 @@ const SingleJourney = () => {
       </Row>
 
       <Row>
-        <Col xs={1}>
-          <b>To :</b>
+        <Col xs={3}>
+          <b>Return to :</b>
         </Col>
         <Col>
           <Link to={getUrl('station', journey.data.returnStationId.toString())}>
@@ -60,14 +67,14 @@ const SingleJourney = () => {
       </Row>
 
       <Row>
-        <Col xs={1}>
-          <b>Distance :</b>
+        <Col xs={3}>
+          <b>Distance covered :</b>
         </Col>
         <Col>{meterToKm(journey.data.distanceCovered)}</Col>
       </Row>
 
       <Row>
-        <Col xs={1}>
+        <Col xs={3}>
           <b>Duration :</b>
         </Col>
         <Col>{secondsToHour(Number(journey.data.duration))}</Col>

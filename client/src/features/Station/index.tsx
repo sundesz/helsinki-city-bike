@@ -35,6 +35,8 @@ const Station = () => {
 
   return (
     <>
+      <div className="page-header">Station List</div>
+
       <StationFilter
         filterText={filterText}
         filterColumn={filterColumn}

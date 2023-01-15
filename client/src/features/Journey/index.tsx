@@ -15,14 +15,6 @@ const Journey = () => {
   const [filterColumn, setFilterColumn] = useState<string>(filterName);
   const [filterText, setFilterText] = useState<string>(filterValue);
 
-  console.log({
-    page,
-    filterName: filterColumn,
-    filterValue,
-    orderBy,
-    orderDir,
-  });
-
   const {
     data: journeyData,
     isLoading,
@@ -47,9 +39,10 @@ const Journey = () => {
   if (!journeyData?.data) {
     return <div>No data </div>;
   }
-  console.log(journeyData);
+
   return (
     <>
+      <div className="page-header">Journey List</div>
       <JourneyFilter
         filterText={filterText}
         filterColumn={filterColumn}
