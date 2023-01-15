@@ -5,10 +5,14 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "dev": "NODE_ENV=development ts-node-dev src/index.ts",
+    "rm-dist": "rm -rf dist/",
+    "rm-build": "rm -rf build/",
+    "build-client": "npm run rm-dist && cd ./client && npm run build && cd .. ",
+    "build-app": "npm run rm-build && npm run build-client && tsc",
+    "start": "NODE_ENV=production node build/index.js",
+    "dev": "npm run build-client && NODE_ENV=development ts-node-dev src/index.ts",
     "lint": "eslint --ext .ts .",
-    "start:test": "NODE_ENV=test ts-node-dev src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:test": "NODE_ENV=test ts-node-dev src/index.ts"
   },
   "repository": {
     "type": "git",
