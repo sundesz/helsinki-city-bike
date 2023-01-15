@@ -62,6 +62,31 @@ const getStationDistanceAndJourney = async (
 };
 
 /**
+ *
+ * @param columnName
+ * @param whereColumn
+ * @param whereValue
+ * @returns
+ */
+export const getStationReport = async (
+  columnName: string,
+  whereColumn: string,
+  whereValue: string
+) => {
+  return await Journey.findAll({
+    attributes: [
+      [sequelize.literal(`extract(year from ${columnName})`), 'year'],
+      [sequelize.literal(`to_char(${columnName}, 'Month')`), 'month'],
+      [sequelize.fn('COUNT', sequelize.col('journey_id')), 'totalJourney'],
+    ],
+    where: {
+      [whereColumn]: whereValue,
+    },
+    group: ['year', 'month'],
+  });
+};
+
+/**
  * Get most used top five station
  * @param columnName
  * @param whereColumn
@@ -137,28 +162,40 @@ const getOne: RequestHandler = async (req, res, next: NextFunction) => {
     if (stationData) {
       // The average distance of a journey starting from the station
       const departureStationData = await getStationDistanceAndJourney(
-        'departureStationName',
-        stationData.dataValues.nameFi
+        'departureStationId',
+        stationData.dataValues.stationId.toString()
       );
 
       // The average distance of a journey ending at the station
       const returnStationData = await getStationDistanceAndJourney(
-        'returnStationName',
-        stationData.dataValues.nameFi
+        'returnStationId',
+        stationData.dataValues.stationId.toString()
       );
 
       // Top 5 most popular departure stations for journeys ending at the station
       const departureStationTop5 = await getTopFiveStation(
         'departure_station_name',
-        'returnStationName',
-        stationData.dataValues.nameFi
+        'returnStationId',
+        stationData.dataValues.stationId.toString()
       );
 
       // Top 5 most popular return stations for journeys starting from the station
       const returnStationTop5 = await getTopFiveStation(
         'return_station_name',
-        'departureStationName',
-        stationData.dataValues.nameFi
+        'departureStationId',
+        stationData.dataValues.stationId.toString()
+      );
+
+      const departureStationReport = await getStationReport(
+        'departure_date_time',
+        'departure_station_id',
+        stationData.dataValues.stationId.toString()
+      );
+
+      const returnStationReport = await getStationReport(
+        'return_date_time',
+        'return_station_id',
+        stationData.dataValues.stationId.toString()
       );
 
       res.json({
@@ -173,6 +210,8 @@ const getOne: RequestHandler = async (req, res, next: NextFunction) => {
           returnStation: returnStationData[0],
           top5Departure: departureStationTop5,
           top5Return: returnStationTop5,
+          departureStationReport,
+          returnStationReport,
         },
       });
     } else {
