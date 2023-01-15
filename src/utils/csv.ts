@@ -35,7 +35,7 @@ let i = 0;
  * @returns
  */
 export const insertBatch = async (fileType: FileTypes, data) => {
-  const { tableName, tableFields, insertTemplate } =
+  const { tableName, tableFields, insertTemplate, conflictTemplate } =
     getTableNameAndField(fileType);
 
   // Create a new array with the next batch of rows
@@ -45,9 +45,9 @@ export const insertBatch = async (fileType: FileTypes, data) => {
 
   // insert rows
   await sequelize.query(
-    `INSERT INTO "${tableName}" (${tableFields}) VALUES ${batch
-      .map(() => `(${insertTemplate})`)
-      .join(',')}`,
+    `INSERT INTO "${tableName}" (${tableFields}) VALUES ${
+      batch.map(() => `(${insertTemplate})`).join(',') + conflictTemplate
+    }`,
     { replacements: batch.flatMap((row) => Object.values(row)) }
   );
 
@@ -208,6 +208,7 @@ const getTableNameAndField = (fileType: FileTypes) => {
   let tableName: string;
   let tableFields: string;
   let insertTemplate: string;
+  let conflictTemplate = '';
 
   if (fileType === 'journey') {
     tableName = 'journey_list';
@@ -217,9 +218,10 @@ const getTableNameAndField = (fileType: FileTypes) => {
     tableName = 'station_list';
     tableFields = `"${STATION_TABLE_FIELDS.join('","')}"`;
     insertTemplate = STATION_TABLE_FIELDS.map(() => '?').toString();
+    conflictTemplate = ' ON CONFLICT (station_id) DO NOTHING;';
   }
 
-  return { tableName, tableFields, insertTemplate };
+  return { tableName, tableFields, insertTemplate, conflictTemplate };
 };
 
 /**
@@ -251,6 +253,7 @@ export const readFile = (fileName: string) => {
     .pipe(
       parse({
         headers: (headers) => {
+          console.log(`Start to read ${fileName}`);
           headers = headers.map((h) => h?.toLowerCase());
           fileType = getFileType(headers);
           return headers;
@@ -291,8 +294,12 @@ export const readFile = (fileName: string) => {
           }
 
           deleteFile(fileName);
+          console.log(`End to read ${fileName}`);
         } catch (error: unknown) {
-          logErrorMessage(error);
+          if (error instanceof Error) {
+            logErrorMessage(`${fileName} - ${error}`);
+          }
+          console.log(error);
         }
       })();
     });
@@ -313,6 +320,7 @@ export const listAllCSVFiles = async () => {
 
   for await (const entry of dir) {
     if (entry.isFile() && entry.name.endsWith('.csv')) {
+      // TODO:: Before read file check if file is already read (get data from 'import_csv_list' table)
       readFile(`${PATH_FOR_DATA}/${entry.name}`);
     }
   }
