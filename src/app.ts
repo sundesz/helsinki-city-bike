@@ -1,7 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 // import cors from 'cors';
-import journeyRoutes from './api/routes/journeyRoutes';
-import stationRoutes from './api/routes/stationRoutes';
+import journeyRouter from './api/routes/journeyRoutes';
+import stationRouter from './api/routes/stationRoutes';
+import testRouter from './api/routes/testRoutes';
 import { errorHandler, unknownEndpoint } from './middleware';
 
 const app: Application = express();
@@ -18,8 +19,12 @@ app.get('/ping', (_req: Request, res: Response) => {
   res.send('pong');
 });
 
-app.use('/api/v1/journey', journeyRoutes);
-app.use('/api/v1/station', stationRoutes);
+app.use('/api/v1/journey', journeyRouter);
+app.use('/api/v1/station', stationRouter);
+
+if (process.env.NODE_ENV === 'test') {
+  app.use('/api/v1/test', testRouter);
+}
 
 app.use(unknownEndpoint);
 app.use(errorHandler);
