@@ -12,6 +12,12 @@ export type ITopStation = IBaseStation & {
   totalJourney: number; // total journey made from the station
 };
 
+export interface IStationReport {
+  year: string;
+  month: string;
+  totalJourney: number;
+}
+
 interface ILocationCoordinate {
   posX: number;
   posY: number;
@@ -39,6 +45,9 @@ export type IStation = IBaseStation &
 
     top5Departure?: ITopStation[];
     top5Return?: ITopStation[];
+
+    departureStationReport?: IStationReport[];
+    returnStationReport?: IStationReport[];
   };
 
 export const StationOrder = {
