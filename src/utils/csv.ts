@@ -20,12 +20,42 @@ import {
   STATION_TABLE_FIELDS,
 } from '../types/station';
 import { logErrorMessage, parseNumber, parseString } from '.';
+import { QueryTypes } from 'sequelize';
 
-// Set the batch size
+// Set the batch size for csv rows
 const batchSize = 100;
 
-// Set the counter to 0
+// Set the counter to 0 for batch update
 let i = 0;
+
+/**
+ * A function to insert the of rows to database
+ * @param fileType
+ * @param data
+ * @returns
+ */
+export const insertBatch = async (fileType: FileTypes, data) => {
+  const { tableName, tableFields, insertTemplate } =
+    getTableNameAndField(fileType);
+
+  // Create a new array with the next batch of rows
+  const batch: StationInputType[] = data.slice(i, i + batchSize);
+  // Increment the counter by the batch size
+  i += batchSize;
+
+  // insert rows
+  await sequelize.query(
+    `INSERT INTO "${tableName}" (${tableFields}) VALUES ${batch
+      .map(() => `(${insertTemplate})`)
+      .join(',')}`,
+    { replacements: batch.flatMap((row) => Object.values(row)) }
+  );
+
+  // if condition match call function again
+  if (i < data.length) {
+    await insertBatch(fileType, data);
+  }
+};
 
 /**
  * Get CSV file type. Is it Journey file or Station File?
@@ -193,38 +223,6 @@ const getTableNameAndField = (fileType: FileTypes) => {
 };
 
 /**
- * A function to insert the next batch of rows
- * @param fileType
- * @param data
- * @returns
- */
-export const insertBatch = (fileType: FileTypes, data) => {
-  const { tableName, tableFields, insertTemplate } =
-    getTableNameAndField(fileType);
-
-  // Create a new array with the next batch of rows
-  const batch: StationInputType[] = data.slice(i, i + batchSize);
-  // Increment the counter by the batch size
-  i += batchSize;
-
-  // Insert the rows
-  return sequelize
-    .query(
-      `INSERT INTO "${tableName}" (${tableFields}) VALUES ${batch
-        .map(() => `(${insertTemplate})`)
-        .join(',')}`,
-      { replacements: batch.flatMap((row) => Object.values(row)) }
-    )
-    .then(() => {
-      // Check if there are more rows to insert
-      if (i < data.length) {
-        // Insert the next batch
-        return insertBatch(fileType, data);
-      }
-    });
-};
-
-/**
  * Check i file is already import or not
  * @param fileName
  * @param fileType
@@ -280,19 +278,17 @@ export const readFile = (fileName: string) => {
       void (async () => {
         try {
           // Start the insertion
-          insertBatch(fileType, data)
-            .then(() => {
-              // console.log('Rows inserted successfully');
-            })
-            .catch((error: unknown) => {
-              logErrorMessage(error);
-            });
+          await insertBatch(fileType, data);
 
           await ImportCsv.create({
             fileName,
             fileType: typeof fileType === 'undefined' ? 'undefined' : fileType,
             isSuccess: true,
           });
+
+          if (fileType === 'station') {
+            await resetSeqForJourney();
+          }
 
           deleteFile(fileName);
         } catch (error: unknown) {
@@ -320,4 +316,25 @@ export const listAllCSVFiles = async () => {
       readFile(`${PATH_FOR_DATA}/${entry.name}`);
     }
   }
+};
+
+/**
+ * Reset sequence number for station_list
+ * @returns
+ */
+export const resetSeqForJourney = async () => {
+  const record: undefined | { station_id: number }[] = await sequelize.query(
+    `SELECT station_id from station_list order by station_id desc limit 1;`,
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  if (record === undefined) {
+    return;
+  }
+
+  await sequelize.query(
+    `SELECT SETVAL('station_list_station_id_seq', ${record[0].station_id}, true);`
+  );
 };

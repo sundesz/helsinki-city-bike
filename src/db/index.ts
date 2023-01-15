@@ -1,9 +1,9 @@
 import { ConnectionError, Sequelize } from 'sequelize';
 import { SequelizeStorage, Umzug } from 'umzug';
-import { DB_HOST, DB_NAME, DB_USER } from '../config';
+import { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER } from '../config';
 import { logErrorMessage } from '../utils';
 
-export const sequelize = new Sequelize(DB_NAME, DB_USER, 'admin', {
+export const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   dialect: 'postgres',
   dialectOptions: {
@@ -12,7 +12,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USER, 'admin', {
     //   rejectUnauthorized: false,
     // },
   },
-  logging: process.env.NODE_ENV === 'production' ? false : console.log, // disable logging; default: console.log
+  logging: process.env.NODE_ENV === 'production' ? false : console.log,
 });
 
 const migrationConf = {

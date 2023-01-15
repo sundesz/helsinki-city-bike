@@ -78,7 +78,7 @@ export const getTopFiveStation = async (
   return await Journey.findAll({
     attributes: [
       [`${columnId}`, 'stationId'],
-      [`${columnName}`, 'name'],
+      [`${columnName}`, 'nameFi'],
       [sequelize.fn('COUNT', sequelize.col('journey_id')), 'totalJourney'],
     ],
     where: {
@@ -164,9 +164,9 @@ const getOne: RequestHandler = async (req, res, next: NextFunction) => {
       res.json({
         data: {
           stationId: stationData.dataValues.stationId,
-          name: stationData.dataValues.nameFi,
-          address: stationData.dataValues.addressFi,
-          city: stationData.dataValues.cityFi,
+          nameFi: stationData.dataValues.nameFi,
+          addressFi: stationData.dataValues.addressFi,
+          cityFi: stationData.dataValues.cityFi,
           posX: stationData.dataValues.posX,
           posY: stationData.dataValues.posY,
           departureStation: departureStationData[0],
@@ -262,7 +262,7 @@ const create: RequestHandler = async (req, res, next: NextFunction) => {
     });
 
     if (checkStation) {
-      throw new Error('Station already exists');
+      throw new Error('Station already exists.');
     }
 
     const station = await Station.create({ ...dataBeforeCreate });

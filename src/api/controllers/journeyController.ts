@@ -92,6 +92,14 @@ const create: RequestHandler = async (req, res, next: NextFunction) => {
       distanceCovered,
     } = toNewJourney(body);
 
+    if (departureStationId === returnStationId) {
+      throw new Error('Departure and return station should be different.');
+    }
+
+    if (getDateInSecond(departureDateTime) >= getDateInSecond(returnDateTime)) {
+      throw new Error('Return date should be after departure.');
+    }
+
     const { departureStation, returnStation } = await getStationData(
       departureStationId,
       returnStationId
@@ -108,7 +116,7 @@ const create: RequestHandler = async (req, res, next: NextFunction) => {
 
     // check if journey detail already exists
     if (journeyExists) {
-      throw new Error('Journey detail already exits');
+      throw new Error('Journey detail already exits.');
     }
 
     const journey = await Journey.create({
