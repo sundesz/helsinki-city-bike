@@ -79,3 +79,10 @@
 .pagination .page-link {
   cursor: pointer;
 }
+
+.page-header {
+  font-size: 2rem;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
