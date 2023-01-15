@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgresdb:
+    image: postgres
+    ports:
+      - 5432:5432
+    restart: always
+    container_name: hsl_postgresdb_test
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: test_admin
+      POSTGRES_DB: hslbikeapp_test
+    volumes:
+      - pgdatatest:/var/lib/postgresql/data
+
+volumes:
+  pgdatatest:
