@@ -1,5 +1,6 @@
 import { SerializedError } from '@reduxjs/toolkit';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/dist/query/react';
+import logger from '../../utils/logger';
 import Page404 from './Page404';
 
 type IErrorPageProps = {
@@ -7,12 +8,13 @@ type IErrorPageProps = {
 };
 
 const ErrorPage = ({ error }: IErrorPageProps) => {
-  if ('data' in error && error.status === 404) {
+  if ('data' in error && [400, 404].includes(error.status as number)) {
     return <Page404 />;
   }
 
-  // temporary solution to display error
-  return <div>{error.toString()}</div>;
+  // temporary solution to display error in console
+  logger.error(error);
+  return null;
 };
 
 export default ErrorPage;

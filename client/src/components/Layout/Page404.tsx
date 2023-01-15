@@ -4,7 +4,8 @@ const Page404 = () => {
   const navigate = useNavigate();
 
   const goBackHandler = () => {
-    navigate(-1);
+    navigate('/');
+    // navigate(-1);
   };
 
   return (
