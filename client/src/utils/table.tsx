@@ -45,6 +45,7 @@ export const tableHeaderData = (pageType: PageType, columnName: string) => {
       {columnName}
       <Stack direction="vertical">
         <span
+          id={`${columnName.replace(/\s/g, '').toLowerCase()}_asc`}
           className={`orderby-up ${
             orderDir === 'asc' && isActive ? 'active' : ''
           }`}
@@ -53,6 +54,7 @@ export const tableHeaderData = (pageType: PageType, columnName: string) => {
           <Link to={generateLinkForOrder(columnName, 'asc')}>&#9652;</Link>
         </span>
         <span
+          id={`${columnName.replace(/\s/g, '').toLowerCase()}_desc`}
           className={`orderby-down ${
             orderDir === 'desc' && isActive ? 'active' : ''
           }`}
