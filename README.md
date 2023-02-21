@@ -1,7 +1,5 @@
 # Helsinki city bike app
 
-Pre-assignment for Solita Dev Academy Finland 2023.
-
 Please download dataset of journey and station and store it to "data" directory
 
 1. https://dev.hsl.fi/citybikes/od-trips-2021/2021-05.csv
@@ -9,7 +7,7 @@ Please download dataset of journey and station and store it to "data" directory
 3. https://dev.hsl.fi/citybikes/od-trips-2021/2021-07.csv
 4. https://opendata.arcgis.com/datasets/726277c507ef4914b0aec3cbcfcbfafc_0.csv
 
-If you have trouble downloading the datasets, please contact heikki.hamalainen@solita.fi or meri.merkkiniemi@solita.fi
+If you have trouble downloading the datasets, please contact sundesz@gmail.com
 
 <br>
 
