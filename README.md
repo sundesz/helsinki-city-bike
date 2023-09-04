@@ -23,18 +23,18 @@ Commands to docker-compose.
 
 ### PRODUCTION DATABASE (start and stop command)
 
-- docker-composer up
-- docker-composer down
+- docker-compose up
+- docker-compose down
 
 ### DEVELOPMENT DATABASE (start and stop command)
 
-- docker-composer -f docker-compose.dev.yml up
-- docker-composer -f docker-compose.dev.yml down
+- docker-compose -f docker-compose.dev.yml up
+- docker-compose -f docker-compose.dev.yml down
 
 ### TEST DATABASE (start and stop command)
 
-- docker-composer -f docker-compose.test.yml up
-- docker-composer -f docker-compose.test.yml down --volumes
+- docker-compose -f docker-compose.test.yml up
+- docker-compose -f docker-compose.test.yml down --volumes
 
 ---
 
